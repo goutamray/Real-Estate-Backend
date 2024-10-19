@@ -3,6 +3,10 @@ import colors from "colors";
 import dotenv from "dotenv";
 import cors from "cors" ;
 import cookieParser from "cookie-parser";
+import mongoDbConnect from "./config/mongoDb.js";
+
+import userRouter from "./routes/user.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 // initialization 
 dotenv.config();
@@ -24,11 +28,15 @@ app.use(cors({
 // static folder 
 app.use(express.static("public"));
 
+// routes 
+app.use("/api/v1/user", userRouter); 
 
+// error handler 
+app.use(errorHandler);   
 
 // app listen 
 app.listen(PORT, () => {
-  // mongoDbConnect(),
+  mongoDbConnect(),
   console.log(` Server is running on port ${PORT} `.bgGreen.black);
 }); 
 
