@@ -2,9 +2,9 @@
 import asyncHandler from "express-async-handler"; 
 import User from "../models/User.js"; 
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { fileDeleteFromCloud, fileUploadToCloud } from "../utilis/cloudinary.js";
 import { findPublicId, isEmail } from "../helpers/helpers.js";
-
 
 /**
  * @DESC GET ALL USER 
@@ -99,6 +99,58 @@ export const createUser = asyncHandler(async(req, res) => {
 
   res.status(201).json({ user, message : "User Created Successfull", });
 });  
+
+
+/**
+ * @DESC User Login
+ * @ROUTE /api/v1/user/login
+ * @method POST
+ * @access public
+ */
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  // validation
+  if (!email || !password)
+    return res.status(404).json({ message: "All fields are required" });
+
+  // find login user by email
+  const loginUser = await User.findOne({ email });
+
+  // user not found
+  if (!loginUser) return res.status(404).json({ message: "User not found" });
+
+  // password check
+  const passwordCheck = await bcrypt.compare(password, loginUser.password);
+
+  // password check
+  if (!passwordCheck)
+    return res.status(404).json({ message: "Wrong password" });
+
+  // create access token
+  const token = jwt.sign(
+    { email: loginUser.email },
+    process.env.USER_LOGIN_SECRET,
+    {
+      expiresIn: "365d",
+    }
+  );
+
+
+  res.cookie("accessToken", token, {
+    httpOnly: true,
+    secure: process.env.APP_ENV == "Development" ? false : true,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json({
+    token,
+    user: loginUser,
+    message: "User Login Successful",
+  });
+});
 
 
 /**

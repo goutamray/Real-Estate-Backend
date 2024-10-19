@@ -5,7 +5,8 @@ import {
   deleteUser, 
   getAllUsers, 
   getSingleUser, 
-  updateUser 
+  updateUser ,
+  loginUser
 } from "../controllers/userController.js";
 import { userPhotoMulter } from "../utilis/multer.js";
 
@@ -15,10 +16,9 @@ const router = express.Router();
 
 
 // routing
-router
-.route("/")
-.get( getAllUsers )
-.post( userPhotoMulter , createUser); 
+router.get("/", getAllUsers); 
+router.post("/register", userPhotoMulter, createUser); 
+router.post("/login", loginUser); 
 
 router
 .route("/:id")
