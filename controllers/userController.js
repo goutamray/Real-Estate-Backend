@@ -181,23 +181,88 @@ export const deleteUser = asyncHandler(async(req, res) => {
  * @ACCESS PUBLIC 
  * 
  */
-export const updateUser = asyncHandler(async(req, res) => {
-   // get params data
-   const { id } = req.params;
+export const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, email } = req.body;
 
-   // get body data
-   const { name, email } = req.body; 
+  try {
+    const existingUser = await User.findById(id);
 
-   // check valid email 
-    if (!isEmail(email)) {
-      return res.status(400).json({users : "", message : "Invalid Email Address"});
-    };
-   
+    if (!existingUser) {
+      console.log('User not found:', id);
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    // update user 
-    const updateUser = await User.findByIdAndUpdate(id, { name, email }, {new : true});
+    // Handle photo upload if file is provided
+    let filedata = existingUser.photo;  // Keep existing photo if no new file is uploaded
+    if (req.file) {
+      const data = await fileUploadToCloud(req.file.path); // Upload new photo
+      filedata = data.secure_url;  // Update filedata with new uploaded photo URL
+    }
 
-    // response 
-     res.status(200).json({ user : updateUser, message : "User Data updated Successfull"});
-});  
+    // Update user data
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        name: name || existingUser.name,     // Use new name or keep the old one
+        email: email || existingUser.email,  // Use new email or keep the old one
+        photo: filedata,  // Use the updated photo URL or keep the existing one
+      },
+      { new: true }  // Return the updated user document
+    );
+
+    res.status(200).json({ user : updatedUser, message: "User data updated successfully" });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+}); 
+
+
+/**
+ * @DESC GOOGLE AUTHENTICATION
+ * @METHOD GET
+ * @ROUTE /api/v1/user/authwithgoogle
+ * @ACCESS PUBLIC 
+ * 
+ */
+export const loginWithGoogle = async (req, res) => {
+  const { name, email, password, photo } = req.body; 
+
+  try {
+      // Check user
+      const existingUser = await User.findOne({ email: email });
+      if (!existingUser) {
+         const result = await User.create({
+          name : name,
+          email : email, 
+          photo : photo,
+          password : password,
+         })
+
+         const token = jwt.sign({ 
+          email : result.email, 
+          id: result._id 
+        }, process.env.USER_LOGIN_SECRET); 
+        
+        return res.status(200).send({ user : result, token : token, msg : "User Login Successfull"}); 
+
+      }else{
+         // Check user
+          const existingUser = await User.findOne({ email: email });
+          const token = jwt.sign({ 
+            email : existingUser.email, 
+            id: existingUser._id 
+          }, process.env.USER_LOGIN_SECRET); 
+
+          return res.status(200).send({ user : existingUser, token : token, msg : "User Login Successfull"}); 
+      }
+
+  } catch (error) {
+     console.log(error);
+  }
+}
+
+
+
 
