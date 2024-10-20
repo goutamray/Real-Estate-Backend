@@ -174,6 +174,7 @@ export const deleteUser = asyncHandler(async(req, res) => {
    res.status(200).json({ user, message : "User deleted successfull"});
 });  
 
+
 /**
  * @DESC UPDATE USER 
  * @METHOD UPDATE
@@ -211,12 +212,13 @@ export const updateUser = asyncHandler(async (req, res) => {
       { new: true }  // Return the updated user document
     );
 
-    res.status(200).json({ user : updatedUser, message: "User data updated successfully" });
+    res.status(200).json({ updatedUser, message: "User data updated successfully" });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 }); 
+
 
 
 /**
@@ -262,7 +264,5 @@ export const loginWithGoogle = async (req, res) => {
      console.log(error);
   }
 }
-
-
 
 

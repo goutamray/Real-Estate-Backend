@@ -10,7 +10,7 @@ import {
   loginWithGoogle
 } from "../controllers/userController.js";
 import { userPhotoMulter } from "../utilis/multer.js";
-import verifyToken from "../middlewares/verifyToken.js";
+// import verifyToken from "../middlewares/verifyToken.js";
 
 
 // init router from exxpress
@@ -26,7 +26,7 @@ router.post("/authwithgoogle", loginWithGoogle);
 router
 .route("/:id")
 .delete(deleteUser)
-.patch(userPhotoMulter, verifyToken, updateUser)
+.patch(userPhotoMulter, updateUser)
 .get(getSingleUser); 
 
 // export default
