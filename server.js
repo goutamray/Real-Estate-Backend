@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import mongoDbConnect from "./config/mongoDb.js";
 
 import userRouter from "./routes/user.js";
+import listingRouter from "./routes/listing.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 // initialization 
@@ -30,6 +31,7 @@ app.use(express.static("public"));
 
 // routes 
 app.use("/api/v1/user", userRouter); 
+app.use("/api/v1/listing", listingRouter); 
 
 // error handler 
 app.use(errorHandler);   
