@@ -33,18 +33,18 @@ const listingSchema = mongoose.Schema({
   },
   furnished : {
     type : Boolean,
-    default : null,
+    default : false,
   },
   parking : {
     type : Boolean,
-    default : null,
+    default : false,
   },
   type : {
     type : String,
     default : null,
   },
   offer : {
-    type : Boolean,
+    type : Number,
     default : null,
   },
   photo : [
@@ -53,6 +53,10 @@ const listingSchema = mongoose.Schema({
       default : null,
     }
   ],
+  size : {
+    type : String,
+    default : null,
+  },
   userRef : {
     type : String,
     default : null,

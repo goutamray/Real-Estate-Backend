@@ -7,6 +7,7 @@ import {
   getAllListing, 
   getSingleListing, 
   updateListing ,
+  getAllSearchListing
 } from "../controllers/listingController.js";
 import { listingPhotoMulter } from "../utilis/multer.js";
 
@@ -18,8 +19,9 @@ const router = express.Router();
 
 // routing
 router.get("/", getAllListing); 
+router.get("/get", getAllSearchListing); 
 router.get("/:id", getSingleListing); 
-router.post("/", listingPhotoMulter, createListing); 
+router.post("/create", listingPhotoMulter, createListing); 
 router.patch("/:id", listingPhotoMulter, updateListing); 
 router.delete("/:id", deleteListing); 
 
